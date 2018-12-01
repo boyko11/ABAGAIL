@@ -34,7 +34,7 @@ public class NNOptimizationTest {
 
         OptimizationAlgorithm optimizationAlgorithm = null;
         if(args.length == 0) {
-            System.out.println("Specify one of the following: RHC, SA, GA or MIMIC: e.g. java NNOptimizationTest RHC");
+            System.out.println("Specify one of the following: RHC, SA, GA: e.g. java NNOptimizationTest RHC");
             return;
         }
 
