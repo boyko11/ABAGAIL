@@ -132,17 +132,18 @@ public class NNOptimizationTest {
                 example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
                 train_error += measure.value(output, example);
             }
-            double test_error = 0;
-            for(int j = 0; j < training_testing_split[1].length; j++) {
-                network.setInputValues(training_testing_split[1][j].getData());
-                network.run();
-
-                Instance output = training_testing_split[1][j].getLabel(), example = new Instance(network.getOutputValues());
-                example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
-                test_error += measure.value(output, example);
-            }
-
             if(i % 100 == 0) {
+
+                double test_error = 0;
+                for(int j = 0; j < training_testing_split[1].length; j++) {
+                    network.setInputValues(training_testing_split[1][j].getData());
+                    network.run();
+
+                    Instance output = training_testing_split[1][j].getLabel(), example = new Instance(network.getOutputValues());
+                    example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
+                    test_error += measure.value(output, example);
+                }
+
                 System.out.println("Iteration " + i + " Train Error: " + df.format(train_error/training_testing_split[0].length) +
                         " Test  Error: " + df.format(test_error/training_testing_split[1].length));
             }
