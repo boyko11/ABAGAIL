@@ -28,10 +28,14 @@ public class GenericHillClimbingProblem extends GenericOptimizationProblem imple
     }
 
     /**
-     * @see opt.HillClimbingProblem#neighbor(opt.OptimizationData)
+     * @see opt.HillClimbingProblem#neighbor(shared.Instance)
      */
     public Instance neighbor(Instance d) {
         return neigh.neighbor(d);
+    }
+
+    public Instance[] twoNeighbors(Instance d) {
+        return twoNeighbors(d);
     }
 
 }

@@ -15,7 +15,7 @@ public interface Distribution extends Serializable {
     /**
      * A random number generator
      */
-    public static final Random random = new Random();  
+    public static final Random random = new Random();
     /**
      * Get the probability of i
      * @param i the discrete value to get the probability of

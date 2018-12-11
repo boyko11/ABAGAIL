@@ -3,6 +3,7 @@ package opt;
 import dist.Distribution;
 
 import shared.Instance;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A neighbor function for changing a single value
@@ -34,6 +35,11 @@ public class DiscreteChangeOneNeighbor implements NeighborFunction {
             cod.getData().set(i, Distribution.random.nextInt(ranges[i]));
         }
         return cod;
+    }
+
+    @Override
+    public Instance[] twoNeighbors(Instance d) {
+        throw new NotImplementedException();
     }
 
 }

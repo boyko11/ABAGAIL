@@ -52,20 +52,19 @@ public class FourPeaksTest {
         fit = new FixedIterationTrainer(sa, 200000);
         fit.train();
         System.out.println("SA: " + ef.value(sa.getOptimal()));
-        
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(500, 400, 1, gap);
-        fit = new FixedIterationTrainer(ga, 10000);
+
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(2000, 1600, 2, gap);
+        fit = new FixedIterationTrainer(ga, 20000);
         fit.train();
         System.out.println("GA: " + ef.value(ga.getOptimal()));
 
-        //StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(500, 400, 1, gap);
-        PBILGeneticAlgorithm pbil_ga = new PBILGeneticAlgorithm(500, 400, 0.001, gap);
-        fit = new FixedIterationTrainer(pbil_ga, 10000);
-        fit.train();
-        System.out.println("PBIL GA: " + ef.value(pbil_ga.getOptimal()));
-        
-        MIMIC mimic = new MIMIC(200, 20, pop);
-        fit = new FixedIterationTrainer(mimic, 1000);
+//        PBILGeneticAlgorithm pbil_ga = new PBILGeneticAlgorithm(2000, 1600, 0.001, gap);
+//        fit = new FixedIterationTrainer(pbil_ga, 5000);
+//        fit.train();
+//        System.out.println("PBIL GA: " + ef.value(pbil_ga.getOptimal()));
+
+        MIMIC mimic = new MIMIC(2000, 20, pop);
+        fit = new FixedIterationTrainer(mimic, 2000);
         fit.train();
         System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
     }

@@ -80,6 +80,10 @@ public class NeuralNetworkOptimizationProblem implements HillClimbingProblem, Ge
     public Instance neighbor(Instance d) {
         return neighbor.neighbor(d);
     }
+
+    public Instance[] twoNeighbors(Instance d) {
+        return neighbor.twoNeighbors(d);
+    }
     
 
     /**

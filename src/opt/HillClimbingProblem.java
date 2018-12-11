@@ -15,4 +15,5 @@ public interface HillClimbingProblem extends OptimizationProblem {
      * @return the data
      */
     public abstract Instance neighbor(Instance d);
+    public abstract Instance[] twoNeighbors(Instance d);
 }

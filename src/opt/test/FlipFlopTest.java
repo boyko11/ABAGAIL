@@ -58,13 +58,13 @@ public class FlipFlopTest {
         fit.train();
         System.out.println(ef.value(sa.getOptimal()));
         
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 20, gap);
-        fit = new FixedIterationTrainer(ga, 1000);
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(2000, 100, 20, gap);
+        fit = new FixedIterationTrainer(ga, 20000);
         fit.train();
         System.out.println(ef.value(ga.getOptimal()));
         
-        MIMIC mimic = new MIMIC(200, 5, pop);
-        fit = new FixedIterationTrainer(mimic, 1000);
+        MIMIC mimic = new MIMIC(2000, 5, pop);
+        fit = new FixedIterationTrainer(mimic, 10000);
         fit.train();
         System.out.println(ef.value(mimic.getOptimal()));
     }

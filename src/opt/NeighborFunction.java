@@ -14,5 +14,6 @@ public interface NeighborFunction {
      * @return the neighbor
      */
     public Instance neighbor(Instance d);
+    public Instance[] twoNeighbors(Instance d);
 
 }

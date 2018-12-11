@@ -3,6 +3,7 @@ package opt;
 import dist.Distribution;
 
 import shared.Instance;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A swap one neighbor function
@@ -22,5 +23,10 @@ public class SwapNeighbor implements NeighborFunction {
         cod.getData().set(i, cod.getContinuous(j));
         cod.getData().set(j, temp);
         return cod;
+    }
+
+    @Override
+    public Instance[] twoNeighbors(Instance d) {
+        throw new NotImplementedException();
     }
 }

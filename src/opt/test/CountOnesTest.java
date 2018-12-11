@@ -58,8 +58,8 @@ public class CountOnesTest {
         fit.train();
         System.out.println(ef.value(sa.getOptimal()));
         
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(20, 20, 0, gap);
-        fit = new FixedIterationTrainer(ga, 300);
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(20000, 20, 1, gap);
+        fit = new FixedIterationTrainer(ga, 3000);
         fit.train();
         System.out.println(ef.value(ga.getOptimal()));
         
