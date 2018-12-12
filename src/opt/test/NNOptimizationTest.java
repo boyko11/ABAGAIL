@@ -127,21 +127,22 @@ public class NNOptimizationTest {
             double fitnessValue = oa.train();
             if(previousIterationFitnessValue == fitnessValue) {
 //                System.out.println("No Change after Train. " + i);
-//                System.out.println("Resetting weights and skipping training.");
+//                System.out.println("Resetting weights and skipping evaluation.");
                 network.setWeights(weights_before_train);
                 continue;
             }
             previousIterationFitnessValue = fitnessValue;
 
-            double train_error = 0;
-            for(int j = 0; j < training_testing_split[0].length; j++) {
-                network.setInputValues(training_testing_split[0][j].getData());
-                network.run();
-
-                Instance output = training_testing_split[0][j].getLabel(), example = new Instance(network.getOutputValues());
-                example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
-                train_error += measure.value(output, example);
-            }
+            double train_error = 1/fitnessValue;
+//            double train_error = 0;
+//            for(int j = 0; j < training_testing_split[0].length; j++) {
+//                network.setInputValues(training_testing_split[0][j].getData());
+//                network.run();
+//
+//                Instance output = training_testing_split[0][j].getLabel(), example = new Instance(network.getOutputValues());
+//                example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
+//                train_error += measure.value(output, example);
+//            }
             if(i % 100 == 0) {
 
                 double test_error = 0;
@@ -154,8 +155,8 @@ public class NNOptimizationTest {
                     test_error += measure.value(output, example);
                 }
 
-                System.out.println("Iteration " + i + " Train Error: " + df.format(train_error/training_testing_split[0].length) +
-                        " Test  Error: " + df.format(test_error/training_testing_split[1].length));
+                System.out.println("Iteration " + i + " Train Error: " + df.format(train_error) +
+                        " Test  Error: " + df.format((test_error/training_testing_split[1].length)*training_testing_split[0].length));
             }
         }
     }
@@ -204,7 +205,7 @@ public class NNOptimizationTest {
         train_test_split[0] = new Instance[number_of_training_records];
         train_test_split[1] = new Instance[number_of_testing_records];
         List<Integer> indices = IntStream.range(0, allInstances.length).boxed().collect(Collectors.toList());
-        Collections.shuffle(indices);
+        Collections.shuffle(indices, new Random(951));
         for(int index = 0; index < number_of_training_records; index++) {
             train_test_split[0][index] = allInstances[indices.get(index)];
         }
