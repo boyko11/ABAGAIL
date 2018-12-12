@@ -11,6 +11,7 @@ import java.io.*;
 import java.text.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import util.linalg.Vector;
 
 
 public class NNOptimizationTest {
@@ -22,7 +23,7 @@ public class NNOptimizationTest {
     private static final double percentageTraining = 0.8;
     private static Instance[][] training_testing_split = getTrainingAndTestingInstances(percentageTraining, instances);
 
-    private static int inputLayer = 30, hiddenLayer = 100, outputLayer = 1, trainingIterations = 3000;
+    private static int inputLayer = 30, hiddenLayer = 100, outputLayer = 1, trainingIterations = 2000;
     private static BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
 
     private static ErrorMeasure measure = new SumOfSquaresError();
@@ -120,8 +121,17 @@ public class NNOptimizationTest {
     private static void train(OptimizationAlgorithm oa, BackPropagationNetwork network, String oaName) {
         System.out.println("\nError results for " + oaName + "\n---------------------------");
 
+        double previousIterationFitnessValue = 0;
         for(int i = 0; i < trainingIterations; i++) {
-            oa.train();
+            Vector weights_before_train = oa.getOptimal().getData();
+            double fitnessValue = oa.train();
+            if(previousIterationFitnessValue == fitnessValue) {
+//                System.out.println("No Change after Train. " + i);
+//                System.out.println("Resetting weights and skipping training.");
+                network.setWeights(weights_before_train);
+                continue;
+            }
+            previousIterationFitnessValue = fitnessValue;
 
             double train_error = 0;
             for(int j = 0; j < training_testing_split[0].length; j++) {
