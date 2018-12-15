@@ -116,7 +116,7 @@ public class PBILGeneticAlgorithm extends OptimizationAlgorithm {
         int total_number_of_bits_to_mutate = (int) Math.round(new Double(total_number_of_bits) * mutationRate);
 
         List<Integer> range = IntStream.range(0, total_number_of_bits).boxed().collect(Collectors.toList());
-        Collections.shuffle(range);
+        Collections.shuffle(range, new Random(987));
         List<Integer> bits_to_mutate = range.subList(0, total_number_of_bits_to_mutate);
         for(int index = 0; index < bits_to_mutate.size(); index++) {
 

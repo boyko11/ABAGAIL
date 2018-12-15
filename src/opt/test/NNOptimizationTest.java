@@ -1,11 +1,14 @@
 package opt.test;
 
+import com.sun.xml.internal.ws.util.StringUtils;
 import opt.*;
 import opt.example.*;
 import opt.ga.*;
 import shared.*;
 import func.nn.backprop.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.io.*;
 import java.text.*;
@@ -16,34 +19,105 @@ import util.linalg.Vector;
 
 public class NNOptimizationTest {
 
-    private static final Integer number_of_records = 569;
-    private static final Integer number_of_features = 30;
-    private static Instance[] instances = initializeInstances(number_of_records, number_of_features);
+    public static void main(String[] args) throws IOException {
 
-    private static final double percentageTraining = 0.8;
-    private static Instance[][] training_testing_split = getTrainingAndTestingInstances(percentageTraining, instances);
-
-    private static int inputLayer = 30, hiddenLayer = 100, outputLayer = 1, trainingIterations = 2000;
-    private static BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
-
-    private static ErrorMeasure measure = new SumOfSquaresError();
-
-    private static DataSet set = new DataSet(training_testing_split[0]);
-
-    private static BackPropagationNetwork network = factory.createClassificationNetwork(
-            new int[] {inputLayer, hiddenLayer, outputLayer});
-    private static NeuralNetworkOptimizationProblem neuralNetworkOptimizationProblem =
-            new NeuralNetworkOptimizationProblem(set, network, measure);
-
-    private static DecimalFormat df = new DecimalFormat("0.000");
-
-    public static void main(String[] args) {
-
-        OptimizationAlgorithm optimizationAlgorithm = null;
         if(args.length == 0) {
             System.out.println("Specify one of the following: RHC, SA, GA: e.g. java NNOptimizationTest RHC");
             return;
         }
+
+        String results_file = "src/opt/test/learning_curve.csv";
+        new File(results_file).delete();
+
+        int trainingIterations = 2000;
+        Integer number_of_records = 569;
+        Integer number_of_features = 30;
+
+        double max_percentage_training = 0.8;
+
+        Instance[] instances = initializeInstances(number_of_records, number_of_features);
+        List<Double> training_times = new ArrayList<>();
+        for(int i = 0; i < 3; i++) {
+
+            System.out.println("Cross validation run " + i);
+
+            Instance[][] training_testing_split = getTrainingAndTestingInstances(max_percentage_training, instances);
+
+            List<Integer> number_of_training_records = new ArrayList<>();
+            List<Double> train_accuracy = new ArrayList<>();
+            List<Double> test_accuracy = new ArrayList<>();
+            double train_increment = 1.0/10.0;
+            for (double current_train_percentage = train_increment; current_train_percentage <= 1.0;
+                 current_train_percentage += train_increment) {
+
+                List<Double> train_records_and_train_and_test_accuracy_and_train_time = train_and_test(
+                        training_testing_split, trainingIterations, current_train_percentage, args);
+                number_of_training_records.add(train_records_and_train_and_test_accuracy_and_train_time.get(0).intValue());
+                train_accuracy.add(train_records_and_train_and_test_accuracy_and_train_time.get(1));
+                test_accuracy.add(train_records_and_train_and_test_accuracy_and_train_time.get(2));
+                if(current_train_percentage == 1.0) {
+                    training_times.add(train_records_and_train_and_test_accuracy_and_train_time.get(3));
+                }
+            }
+            append_to_results_file(results_file, number_of_training_records, train_accuracy, test_accuracy);
+
+        }
+
+        System.out.println("Training times: ");
+        for(Double training_time : training_times) {
+            System.out.println(training_time);
+        }
+
+        System.out.println("Average Training Time: " + training_times.stream().mapToDouble(time -> time).average());
+
+    }
+
+    private static void append_to_results_file(String results_file, List<Integer> number_of_training_records,
+                                               List<Double> train_accuracy, List<Double> test_accuracy) throws IOException {
+
+        new File(results_file).createNewFile();
+        BufferedWriter bw = new BufferedWriter(new FileWriter(results_file, true));
+        bw.write(String.join(",", number_of_training_records.stream().map(Object::toString).collect(Collectors.toList())));
+        bw.newLine();
+        bw.write(String.join(",", train_accuracy.stream().map(score -> BigDecimal.valueOf(score)
+                .setScale(3, RoundingMode.HALF_UP).toString()).collect(Collectors.toList())));
+        bw.newLine();
+        bw.write(String.join(",", test_accuracy.stream().map(score -> BigDecimal.valueOf(score)
+                .setScale(3, RoundingMode.HALF_UP).toString()).collect(Collectors.toList())));
+        bw.newLine();
+        bw.close();
+    }
+
+
+    private static List<Double> train_and_test(Instance[][] training_testing_split, int trainingIterations,
+                                               double current_train_percentage, String[] args) {
+
+        int inputLayer = 30, hiddenLayer = 100, outputLayer = 1;
+        BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
+
+        ErrorMeasure measure = new SumOfSquaresError();
+
+        Instance[] trainingRecords = training_testing_split[0];
+        Instance[] testingRecords = training_testing_split[1];
+
+        int number_of_training_records_to_use = (int) (trainingRecords.length * current_train_percentage);
+        Instance[] trainingRecords_to_use = new Instance[number_of_training_records_to_use];
+        List<Integer> indices = IntStream.range(0, trainingRecords.length).boxed().collect(Collectors.toList());
+        Collections.shuffle(indices, new Random());
+        for(int index = 0; index < number_of_training_records_to_use; index++) {
+            trainingRecords_to_use[index] = trainingRecords[indices.get(index)];
+        }
+
+        DataSet set = new DataSet(trainingRecords);
+
+        BackPropagationNetwork network = factory.createClassificationNetwork(
+                new int[] {inputLayer, hiddenLayer, outputLayer});
+        NeuralNetworkOptimizationProblem neuralNetworkOptimizationProblem =
+                new NeuralNetworkOptimizationProblem(set, network, measure);
+
+        DecimalFormat df = new DecimalFormat("0.000");
+
+        OptimizationAlgorithm optimizationAlgorithm = null;
 
         final String optimizationAlgoToUse = args[0];
 
@@ -68,7 +142,8 @@ public class NNOptimizationTest {
         }
 
         double start = System.nanoTime(), end, trainingTime, testingTime, correct = 0, incorrect = 0;
-        train(optimizationAlgorithm, network, optimizationAlgoToUse); //trainer.train();
+        train(optimizationAlgorithm, network, optimizationAlgoToUse, trainingIterations, trainingRecords_to_use, testingRecords,
+                measure, df); //trainer.train();
         end = System.nanoTime();
         trainingTime = end - start;
         trainingTime /= Math.pow(10,9);
@@ -77,30 +152,32 @@ public class NNOptimizationTest {
         network.setWeights(optimalInstance.getData());
 
         double predicted, actual;
-        for(int j = 0; j < training_testing_split[0].length; j++) {
-            network.setInputValues(training_testing_split[0][j].getData());
+        for(int j = 0; j < trainingRecords_to_use.length; j++) {
+            network.setInputValues(trainingRecords_to_use[j].getData());
             network.run();
 
-            predicted = Double.parseDouble(training_testing_split[0][j].getLabel().toString());
+            predicted = Double.parseDouble(trainingRecords_to_use[j].getLabel().toString());
             actual = Double.parseDouble(network.getOutputValues().toString());
 
             double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
 
         }
 
-        String training_results =  "\nTRAINING Results for " + optimizationAlgoToUse + ": \nCorrectly classified " + correct + " instances." +
+        Double training_accuracy = correct/(correct+incorrect)*100;
+        String training_results =  "\nTRAINING Results for " + optimizationAlgoToUse + ": \nTraining Records: "
+                + current_train_percentage + " : " + number_of_training_records_to_use + ": \nCorrectly classified " + correct + " instances." +
                 "\nIncorrectly classified " + incorrect + " instances.\nPercent correctly classified: "
-                + df.format(correct/(correct+incorrect)*100);
+                + df.format(training_accuracy);
         System.out.println(training_results);
 
         correct = 0;
         incorrect = 0;
         start = System.nanoTime();
-        for(int j = 0; j < training_testing_split[1].length; j++) {
-            network.setInputValues(training_testing_split[1][j].getData());
+        for(int j = 0; j < testingRecords.length; j++) {
+            network.setInputValues(testingRecords[j].getData());
             network.run();
 
-            predicted = Double.parseDouble(training_testing_split[1][j].getLabel().toString());
+            predicted = Double.parseDouble(testingRecords[j].getLabel().toString());
             actual = Double.parseDouble(network.getOutputValues().toString());
 
             double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
@@ -110,15 +187,25 @@ public class NNOptimizationTest {
         testingTime = end - start;
         testingTime /= Math.pow(10,9);
 
-        String testing_results =  "\nTESTING Results for " + optimizationAlgoToUse + ": \nCorrectly classified " + correct + " instances." +
+        double testing_accuracy = correct/(correct+incorrect)*100;
+        String testing_results =  "\nTESTING Results for " + optimizationAlgoToUse +": \nTesting Records: " + testingRecords.length + "\nCorrectly classified " + correct + " instances." +
                 "\nIncorrectly classified " + incorrect + " instances.\nPercent correctly classified: "
-                + df.format(correct/(correct+incorrect)*100) + "%\nTraining time: " + df.format(trainingTime)
+                + df.format(testing_accuracy) + "%\nTraining time: " + df.format(trainingTime)
                 + " seconds\nTesting time: " + df.format(testingTime) + " seconds\n";
 
         System.out.println(testing_results);
+
+        List<Double> results = new ArrayList<>();
+        results.add(new Double(trainingRecords_to_use.length));
+        results.add(training_accuracy);
+        results.add(testing_accuracy);
+        results.add(trainingTime);
+        return results;
     }
 
-    private static void train(OptimizationAlgorithm oa, BackPropagationNetwork network, String oaName) {
+    private static void train(OptimizationAlgorithm oa, BackPropagationNetwork network, String oaName,
+                              int trainingIterations, Instance[] train_records, Instance[] test_records,
+                              ErrorMeasure measure, DecimalFormat df) {
         System.out.println("\nError results for " + oaName + "\n---------------------------");
 
         double previousIterationFitnessValue = 0;
@@ -126,38 +213,28 @@ public class NNOptimizationTest {
             Vector weights_before_train = oa.getOptimal().getData();
             double fitnessValue = oa.train();
             if(previousIterationFitnessValue == fitnessValue) {
-//                System.out.println("No Change after Train. " + i);
-//                System.out.println("Resetting weights and skipping evaluation.");
                 network.setWeights(weights_before_train);
                 continue;
             }
             previousIterationFitnessValue = fitnessValue;
 
-            double train_error = 1/fitnessValue;
-//            double train_error = 0;
-//            for(int j = 0; j < training_testing_split[0].length; j++) {
-//                network.setInputValues(training_testing_split[0][j].getData());
-//                network.run();
+//            double train_error = 1/fitnessValue;
 //
-//                Instance output = training_testing_split[0][j].getLabel(), example = new Instance(network.getOutputValues());
-//                example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
-//                train_error += measure.value(output, example);
+//            if(i % 100 == 0) {
+//
+//                double test_error = 0;
+//                for(int j = 0; j < test_records.length; j++) {
+//                    network.setInputValues(test_records[j].getData());
+//                    network.run();
+//
+//                    Instance output = test_records[j].getLabel(), example = new Instance(network.getOutputValues());
+//                    example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
+//                    test_error += measure.value(output, example);
+//                }
+//
+//                System.out.println("Iteration " + i + " Train Error: " + df.format(train_error) +
+//                        " Test  Error: " + df.format((test_error/test_records.length)*train_records.length));
 //            }
-            if(i % 100 == 0) {
-
-                double test_error = 0;
-                for(int j = 0; j < training_testing_split[1].length; j++) {
-                    network.setInputValues(training_testing_split[1][j].getData());
-                    network.run();
-
-                    Instance output = training_testing_split[1][j].getLabel(), example = new Instance(network.getOutputValues());
-                    example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
-                    test_error += measure.value(output, example);
-                }
-
-                System.out.println("Iteration " + i + " Train Error: " + df.format(train_error) +
-                        " Test  Error: " + df.format((test_error/training_testing_split[1].length)*training_testing_split[0].length));
-            }
         }
     }
 
@@ -205,7 +282,7 @@ public class NNOptimizationTest {
         train_test_split[0] = new Instance[number_of_training_records];
         train_test_split[1] = new Instance[number_of_testing_records];
         List<Integer> indices = IntStream.range(0, allInstances.length).boxed().collect(Collectors.toList());
-        Collections.shuffle(indices, new Random(951));
+        Collections.shuffle(indices, new Random());
         for(int index = 0; index < number_of_training_records; index++) {
             train_test_split[0][index] = allInstances[indices.get(index)];
         }
