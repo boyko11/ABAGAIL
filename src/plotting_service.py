@@ -1,10 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_learning_curve():
+def plot_learning_curve(title, x_label, results_file, dots, fill):
 
-    title = "Learning curve by training sizes"
-    data = np.genfromtxt('opt/test/learning_curve.csv', delimiter=',')
+    data = np.genfromtxt(results_file, delimiter=',')
 
     number_of_lines = data.shape[0]
     train_size_indices = range(0, number_of_lines, 3)
@@ -19,7 +18,7 @@ def plot_learning_curve():
     plt.title(title)
     # if ylim is not None:
     #     plt.ylim(*ylim)
-    plt.xlabel("Training examples")
+    plt.xlabel(x_label)
     plt.ylabel("Error")
 
     train_errors = 1 - train_scores
@@ -35,19 +34,34 @@ def plot_learning_curve():
 
     plt.grid()
 
-    plt.fill_between(train_sizes, train_errors_mean - train_errors_std,
-                     train_errors_mean + train_errors_std, alpha=0.1,
-                     color="r")
-    plt.fill_between(train_sizes, test_errors_mean - test_errors_std,
-                     test_errors_mean + test_errors_std, alpha=0.1, color="g")
+    if fill:
+        plt.fill_between(train_sizes, train_errors_mean - train_errors_std,
+                         train_errors_mean + train_errors_std, alpha=0.1,
+                         color="r")
+        plt.fill_between(train_sizes, test_errors_mean - test_errors_std,
+                         test_errors_mean + test_errors_std, alpha=0.1, color="g")
 
-    plt.plot(train_sizes, train_errors_mean, 'o-', color="r",
-             label="Training error")
-    plt.plot(train_sizes, test_errors_mean, 'o-', color="g",
-             label="Test error")
+    if dots:
+        plt.plot(train_sizes, train_errors_mean, 'o-', color="r", label="Training error")
+        plt.plot(train_sizes, test_errors_mean, 'o-', color="g", label="Test error")
+    else:
+        plt.plot(train_sizes, train_errors_mean, color="r", label="Training error")
+        plt.plot(train_sizes, test_errors_mean, color="g", label="Test error")
 
     plt.legend(loc="best")
     plt.show()
     print('Finished')
 
-plot_learning_curve()
+# title = 'Learning curve by training set sizes'
+# x_label = 'Training examples'
+# results_file = 'opt/test/learning_curve_training_sizes.csv'
+# dots = True
+# fill = True
+
+
+title = 'Learning curve by iterations'
+x_label = 'Iterations'
+results_file = 'opt/test/learning_curve_iterations.csv'
+dots = False
+fill =  False
+plot_learning_curve(title, x_label, results_file, dots, fill)
