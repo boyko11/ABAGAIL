@@ -35,7 +35,12 @@ public class GenericHillClimbingProblem extends GenericOptimizationProblem imple
     }
 
     public Instance[] twoNeighbors(Instance d) {
-        return twoNeighbors(d);
+
+        Instance[] neighbors = new Instance[2];
+        neighbors[0] = neigh.neighbor(d);
+        neighbors[1] = neigh.neighbor(d);
+
+        return neighbors;
     }
 
 }

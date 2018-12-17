@@ -48,24 +48,32 @@ public class FlipFlopTest {
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         
-        RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
-        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
-        fit.train();
-        System.out.println(ef.value(rhc.getOptimal()));
+        RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
+        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200);
+        fit.setConvergence_value(N - 1);
+        fit.setEvaluationFunction(ef);
+//        fit.train();
+//        System.out.println(ef.value(rhc.getOptimal()));
         
         SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
-        fit = new FixedIterationTrainer(sa, 200000);
+        fit = new FixedIterationTrainer(sa, 500000);
+        fit.setConvergence_value(N - 1);
+        fit.setEvaluationFunction(ef);
         fit.train();
         System.out.println(ef.value(sa.getOptimal()));
-        
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(2000, 100, 20, gap);
-        fit = new FixedIterationTrainer(ga, 20000);
-        fit.train();
-        System.out.println(ef.value(ga.getOptimal()));
-        
-        MIMIC mimic = new MIMIC(2000, 5, pop);
-        fit = new FixedIterationTrainer(mimic, 10000);
-        fit.train();
-        System.out.println(ef.value(mimic.getOptimal()));
+//
+//        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(40000, 2000, 150, gap);
+//        fit = new FixedIterationTrainer(ga, 40000);
+//        fit.setConvergence_value(N - 1);
+//        fit.setEvaluationFunction(ef);
+//        fit.train();
+//        System.out.println(ef.value(ga.getOptimal()));
+//
+//        MIMIC mimic = new MIMIC(5000, 2000, pop);
+//        fit = new FixedIterationTrainer(mimic, 20000);
+//        fit.setConvergence_value(N - 1);
+//        fit.setEvaluationFunction(ef);
+//        fit.train();
+//        System.out.println(ef.value(mimic.getOptimal()));
     }
 }

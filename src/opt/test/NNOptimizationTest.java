@@ -32,7 +32,7 @@ public class NNOptimizationTest {
         String learning_curve_by_iterations_file = "src/opt/test/learning_curve_iterations.csv";
         new File(learning_curve_by_iterations_file).delete();
 
-        int trainingIterations = 150;
+        int trainingIterations = 1300;
         int iteration_recording_step = 10;
         Integer number_of_records = 569;
         Integer number_of_features = 30;
@@ -41,6 +41,8 @@ public class NNOptimizationTest {
 
         Instance[] instances = initializeInstances(number_of_records, number_of_features);
         List<Double> training_times = new ArrayList<>();
+        List<Double> last_train_accuracy = new ArrayList<>();
+        List<Double> last_test_accuracy = new ArrayList<>();
         for(int i = 0; i < 3; i++) {
 
             System.out.println("Cross validation run " + i);
@@ -66,6 +68,8 @@ public class NNOptimizationTest {
                 test_accuracy.add(train_records_and_train_and_test_accuracy_and_train_time.get(2));
                 if(current_train_percentage == 1.0) {
                     training_times.add(train_records_and_train_and_test_accuracy_and_train_time.get(3));
+                    last_train_accuracy.add(train_records_and_train_and_test_accuracy_and_train_time.get(1));
+                    last_test_accuracy.add(train_records_and_train_and_test_accuracy_and_train_time.get(2));
                 }
             }
             append_to_results_file(learning_curve_by_train_sizes_file, number_of_training_records, train_accuracy,
@@ -79,6 +83,8 @@ public class NNOptimizationTest {
         }
 
         System.out.println("Average Training Time: " + training_times.stream().mapToDouble(time -> time).average());
+        System.out.println("Average Training Accuracy: " + last_train_accuracy.stream().mapToDouble(time -> time).average());
+        System.out.println("Average Testing Accuracy: " + last_test_accuracy.stream().mapToDouble(time -> time).average());
 
     }
 
