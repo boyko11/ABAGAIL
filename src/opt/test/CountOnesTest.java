@@ -38,6 +38,9 @@ public class CountOnesTest {
     private static final int N = 80;
     
     public static void main(String[] args) {
+
+        System.out.println("CountOnesTest start.");
+
         int[] ranges = new int[N];
         Arrays.fill(ranges, 2);
         EvaluationFunction ef = new CountOnesEvaluationFunction();
@@ -50,47 +53,43 @@ public class CountOnesTest {
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
 
-        FixedIterationTrainer fit = new FixedIterationTrainer(null, 200);
 
+        System.out.println("RHC: ");
+        RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
+        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 400);
+        fit.setConvergence_value(new Double(N));
+        fit.setEvaluationFunction(ef);
+        fit.train();
+        System.out.println("Optimum after training: " + ef.value(rhc.getOptimal()));
+        System.out.println("-------------------------------------");
 
-//        int rhc_iter_sum = 0;
-//        long rhc_time_sum = 0l;
-//        int sa_iter_sum = 0;
-//        long sa_time_sum = 0l;
-//
-//
-//        for(int i = 0; i < 1000; i++) {
-//            RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
-//            fit = new FixedIterationTrainer(rhc, 200);
-//            fit.setConvergence_value(new Double(N));
-//            fit.train();
-//            System.out.println(ef.value(rhc.getOptimal()));
-//            rhc_iter_sum += fit.getConverge_iter();
-//            rhc_time_sum += fit.getTrain_time();
-//
-//            SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
-//            fit = new FixedIterationTrainer(sa, 400);
-//            fit.setConvergence_value(new Double(N));
-//            fit.train();
-//            System.out.println(ef.value(sa.getOptimal()));
-//            sa_iter_sum += fit.getConverge_iter();
-//            sa_time_sum += fit.getTrain_time();
-//        }
-//        System.out.println("Avg RHC iterations: " + new Double(rhc_iter_sum)/1000.0);
-//        System.out.println("Avg RHC train time ms: " + rhc_time_sum/Math.pow(10,6)/1000.0);
-//        System.out.println("Avg SA iterations: " + new Double(sa_iter_sum)/1000.0);
-//        System.out.println("Avg SA train time ms: " + sa_time_sum/Math.pow(10, 6)/1000.0);
-        
-//        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(500, 200, 10, gap);
-//        fit = new FixedIterationTrainer(ga, 3000);
-//        fit.setConvergence_value(new Double(N));
-//        fit.train();
-//        System.out.println(ef.value(ga.getOptimal()));
+        System.out.println("SA: ");
+        SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
+        fit = new FixedIterationTrainer(sa, 800);
+        fit.setConvergence_value(new Double(N));
+        fit.setEvaluationFunction(ef);
+        fit.train();
+        System.out.println("Optimum after training: " + ef.value(sa.getOptimal()));
+        System.out.println("-------------------------------------");
 
+        System.out.println("GA: ");
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(500, 200, 10, gap);
+        fit = new FixedIterationTrainer(ga, 3000);
+        fit.setConvergence_value(new Double(N));
+        fit.setEvaluationFunction(ef);
+        fit.train();
+        System.out.println("Optimum after training: " + ef.value(ga.getOptimal()));
+        System.out.println("-------------------------------------");
+
+        System.out.println("MIMIC: ");
         MIMIC mimic = new MIMIC(50, 10, pop);
         fit = new FixedIterationTrainer(mimic, 1000);
         fit.setConvergence_value(new Double(N));
+        fit.setEvaluationFunction(ef);
         fit.train();
-        System.out.println(ef.value(mimic.getOptimal()));
+        System.out.println("Optimum after training: " + ef.value(mimic.getOptimal()));
+        System.out.println("-------------------------------------");
+
+        System.out.println("CountOnesTest end.");
     }
 }

@@ -39,6 +39,7 @@ import shared.FixedIterationTrainer;
  * @version 1.0
  */
 public class KnapsackTest {
+
     /** Random number generator */
     private static final Random random = new Random();
     /** The number of items */
@@ -60,6 +61,8 @@ public class KnapsackTest {
     public static void main(String[] args) {
 
 
+        System.out.println("KnapsackTest start.");
+
         double rhc_sum = 0;
         double sa_sum = 0;
         double ga_sum = 0;
@@ -70,7 +73,10 @@ public class KnapsackTest {
         double ga_train_time_sum = 0;
         double mimic_train_time_sum = 0;
 
-        for(int a = 0; a < 10; a++) {
+        for(int a = 0; a < 3; a++) {
+
+            System.out.println("--------------------------");
+            System.out.println("Cross-validation run " + a);
             int[] copies = new int[NUM_ITEMS];
             Arrays.fill(copies, COPIES_EACH);
             double[] values = new double[NUM_ITEMS];
@@ -94,38 +100,53 @@ public class KnapsackTest {
             GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
             ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
 
+            System.out.println("RHC:");
             RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
             FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
+            fit.setPrintDidNotConvergeMessage(false);
             fit.train();
             rhc_train_time_sum += fit.getTrain_time();
             double rhc_opt_value = ef.value(rhc.getOptimal());
             rhc_sum += rhc_opt_value;
-            System.out.println("RHC: " + rhc_opt_value);
+            System.out.println("optimum value: " + rhc_opt_value);
+            System.out.println("--------------------------");
 
+            System.out.println("SA:");
             SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
             fit = new FixedIterationTrainer(sa, 200000);
+            fit.setPrintDidNotConvergeMessage(false);
             fit.train();
             sa_train_time_sum += fit.getTrain_time();
             double sa_opt_value = ef.value(sa.getOptimal());
             sa_sum += sa_opt_value;
-            System.out.println("SA: " + sa_opt_value);
-//
+            System.out.println("optimum value: " + sa_opt_value);
+            System.out.println("--------------------------");
+
+            System.out.println("GA:");
             StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 150, 25, gap);
             fit = new FixedIterationTrainer(ga, 1000);
+            fit.setPrintDidNotConvergeMessage(false);
             fit.train();
             ga_train_time_sum += fit.getTrain_time();
             double ga_opt_value = ef.value(ga.getOptimal());
             ga_sum += ga_opt_value;
-            System.out.println("GA: " + ga_opt_value);
+            System.out.println("optimum value: " + ga_opt_value);
+            System.out.println("--------------------------");
 
+            System.out.println("MIMIC:");
             MIMIC mimic = new MIMIC(200, 100, pop);
             fit = new FixedIterationTrainer(mimic, 1000);
+            fit.setPrintDidNotConvergeMessage(false);
             fit.train();
             mimic_train_time_sum += fit.getTrain_time();
             double mimic_opt_value = ef.value(mimic.getOptimal());
             mimic_sum += mimic_opt_value;
-            System.out.println("MIMIC: " + mimic_opt_value);
+            System.out.println("optimum value: " + mimic_opt_value);
+            System.out.println("--------------------------");
         }
+
+        System.out.println("--------------------------");
+        System.out.println("--------------------------");
 
         System.out.println("Avg Opt Value:");
         System.out.println("RHC: " + rhc_sum/10.0);

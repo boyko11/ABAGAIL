@@ -36,6 +36,8 @@ public class FlipFlopTest {
     private static final int N = 80;
     
     public static void main(String[] args) {
+
+        System.out.println("AlternatingOnesTest start.");
         int[] ranges = new int[N];
         Arrays.fill(ranges, 2);
         EvaluationFunction ef = new FlipFlopEvaluationFunction();
@@ -47,33 +49,43 @@ public class FlipFlopTest {
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-        
+
+        System.out.println("RHC: ");
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200);
         fit.setConvergence_value(N - 1);
         fit.setEvaluationFunction(ef);
-//        fit.train();
-//        System.out.println(ef.value(rhc.getOptimal()));
-        
+        fit.train();
+        System.out.println("Optimum after training: " + ef.value(rhc.getOptimal()));
+        System.out.println("-------------------------------------");
+
+        System.out.println("SA: ");
         SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
         fit = new FixedIterationTrainer(sa, 500000);
         fit.setConvergence_value(N - 1);
         fit.setEvaluationFunction(ef);
         fit.train();
-        System.out.println(ef.value(sa.getOptimal()));
-//
-//        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(40000, 2000, 150, gap);
-//        fit = new FixedIterationTrainer(ga, 40000);
-//        fit.setConvergence_value(N - 1);
-//        fit.setEvaluationFunction(ef);
-//        fit.train();
-//        System.out.println(ef.value(ga.getOptimal()));
-//
-//        MIMIC mimic = new MIMIC(5000, 2000, pop);
-//        fit = new FixedIterationTrainer(mimic, 20000);
-//        fit.setConvergence_value(N - 1);
-//        fit.setEvaluationFunction(ef);
-//        fit.train();
-//        System.out.println(ef.value(mimic.getOptimal()));
+        System.out.println("Optimum after training: " + ef.value(sa.getOptimal()));
+        System.out.println("-------------------------------------");
+
+        System.out.println("GA: ");
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(40000, 2000, 150, gap);
+        fit = new FixedIterationTrainer(ga, 400);
+        fit.setConvergence_value(N - 1);
+        fit.setEvaluationFunction(ef);
+        fit.train();
+        System.out.println("Optimum after training: " + ef.value(ga.getOptimal()));
+        System.out.println("-------------------------------------");
+
+        System.out.println("MIMIC: ");
+        MIMIC mimic = new MIMIC(5000, 2000, pop);
+        fit = new FixedIterationTrainer(mimic, 25);
+        fit.setConvergence_value(N - 1);
+        fit.setEvaluationFunction(ef);
+        fit.train();
+        System.out.println("Optimum after training: " + ef.value(mimic.getOptimal()));
+        System.out.println("-------------------------------------");
+
+        System.out.println("AlternatingOnesTest end.");
     }
 }

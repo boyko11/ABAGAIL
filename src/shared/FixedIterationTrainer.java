@@ -27,6 +27,8 @@ public class FixedIterationTrainer implements Trainer {
     private int converge_iter = 0;
     private double train_time = 0.0;
 
+    private boolean printDidNotConvergeMessage = true;
+
     /**
      * Make a new fixed iterations trainer
      * @param t the trainer
@@ -44,15 +46,17 @@ public class FixedIterationTrainer implements Trainer {
         long start_time = System.currentTimeMillis();
         double sum = 0;
         this.converge_iter = iterations;
+        boolean converged = false;
         for (int i = 0; i < iterations; i++) {
             double optimal_value_after_training = trainer.train();
             double current_optimal_value = optimal_value_after_training;
             sum += optimal_value_after_training;
             if(this.evaluationFunction != null) {
                 current_optimal_value = this.evaluationFunction.value(((OptimizationAlgorithm) trainer).getOptimal());
-                if (this.convergence_value == current_optimal_value) {
+                if (this.convergence_value <= current_optimal_value) {
                     System.out.println("Converged in " + i + " iterations");
                     this.converge_iter = i + 1;
+                    converged = true;
                     break;
                 }
             }
@@ -62,6 +66,9 @@ public class FixedIterationTrainer implements Trainer {
         }
         long end_time = System.currentTimeMillis();
         this.train_time = end_time - start_time;
+        if(!converged && this.printDidNotConvergeMessage) {
+            System.out.println("Did NOT converge.");
+        }
         System.out.println("Training Time ms: " + this.train_time);
         return sum / iterations;
     }
@@ -81,5 +88,10 @@ public class FixedIterationTrainer implements Trainer {
 
     public double getTrain_time() {
         return this.train_time;
+    }
+
+    public void setPrintDidNotConvergeMessage(boolean printDidNotConvergeMessage) {
+
+        this.printDidNotConvergeMessage = printDidNotConvergeMessage;
     }
 }

@@ -18,8 +18,8 @@
 
     <target name="jar" depends="compile">
         <manifest file="manifest.mf"/>
-        <delete file="ABAGAIL.jar"/>
-        <jar basedir="bin/" destfile="ABAGAIL.jar" manifest="manifest.mf"/>
+        <delete file="ABAGAIL-Boyko.jar"/>
+        <jar basedir="bin/" destfile="ABAGAIL-Boyko.jar" manifest="manifest.mf"/>
     </target>
 
     <target name="clean">

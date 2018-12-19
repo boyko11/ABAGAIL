@@ -31,14 +31,25 @@ public class NNOptimizationTestBoyko {
             System.out.println("Specify one of the following: RHC, SA, GA: e.g. java NNOptimizationTest RHC");
             return;
         }
+        boolean generate_lc_by_training_sizes = false;
+        if(args.length > 1) {
+            if(args[1].equals("training_sizes")) {
+                generate_lc_by_training_sizes = true;
+            }
+        }
 
         String learning_curve_by_train_sizes_file = "learning_curve_training_sizes_" + args[0] + ".csv";
-        new File(learning_curve_by_train_sizes_file).delete();
 
         String learning_curve_by_iterations_file = "learning_curve_iterations_" + args[0] + ".csv";
         new File(learning_curve_by_iterations_file).delete();
 
         int trainingIterations = 1300;
+        if(args[0].equals("SA")) {
+            trainingIterations = 2500;
+        }
+        if(args[0].equals("GA")) {
+            trainingIterations = 175;
+        }
         int iteration_recording_step = 10;
         Integer number_of_records = 569;
         Integer number_of_features = 30;
@@ -62,7 +73,9 @@ public class NNOptimizationTestBoyko {
             //for learning curve by iterations
             double train_increment = 1.0;
             //for Learning Curve by number of training records
-            //double train_increment = 1.0/10.0;
+            if(generate_lc_by_training_sizes) {
+                train_increment = 1.0 / 10.0;
+            }
             for (double current_train_percentage = train_increment; current_train_percentage <= 1.0;
                  current_train_percentage += train_increment) {
 
@@ -78,8 +91,10 @@ public class NNOptimizationTestBoyko {
                     last_test_accuracy.add(train_records_and_train_and_test_accuracy_and_train_time.get(2));
                 }
             }
-            append_to_results_file(learning_curve_by_train_sizes_file, number_of_training_records, train_accuracy,
-                    test_accuracy);
+            if(generate_lc_by_training_sizes) {
+                append_to_results_file(learning_curve_by_train_sizes_file, number_of_training_records, train_accuracy,
+                        test_accuracy);
+            }
 
 //        }
 
@@ -293,9 +308,9 @@ public class NNOptimizationTestBoyko {
                 Double test_accuracy = correct/(correct+incorrect)*100;
                 test_accuracy_per_iteration.add(test_accuracy);
 
-
-//                System.out.println("Iteration " + i + " Train Error: " + df.format(train_error) +
-//                        " Test  Error: " + df.format((test_error/test_records.length)*train_records.length));
+                DecimalFormat df = new DecimalFormat("0.000");
+                System.out.println("Iteration " + i + " Train Error: " + df.format(train_error) +
+                        " Test  Error: " + df.format((test_error/test_records.length)*train_records.length));
             }
         }
         accuracy_per_iteration.add(train_accuracy_per_iteration);
