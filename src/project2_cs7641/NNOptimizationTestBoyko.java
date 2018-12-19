@@ -1,22 +1,29 @@
-package opt.test;
+package project2_cs7641;
 
-import opt.*;
-import opt.example.*;
-import opt.ga.*;
-import shared.*;
-import func.nn.backprop.*;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.io.*;
-import java.text.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import func.nn.backprop.BackPropagationNetwork;
+import func.nn.backprop.BackPropagationNetworkFactory;
+import opt.OptimizationAlgorithm;
+import opt.RandomizedHillClimbing;
+import opt.SimulatedAnnealing;
+import opt.example.NeuralNetworkOptimizationProblem;
+import opt.ga.StandardGeneticAlgorithm;
+import shared.DataSet;
+import shared.ErrorMeasure;
+import shared.Instance;
+import shared.SumOfSquaresError;
 import util.linalg.Vector;
 
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class NNOptimizationTest {
+
+public class NNOptimizationTestBoyko {
 
     public static void main(String[] args) throws IOException {
 
@@ -25,10 +32,10 @@ public class NNOptimizationTest {
             return;
         }
 
-        String learning_curve_by_train_sizes_file = "src/opt/test/learning_curve_training_sizes.csv";
+        String learning_curve_by_train_sizes_file = "learning_curve_training_sizes_" + args[0] + ".csv";
         new File(learning_curve_by_train_sizes_file).delete();
 
-        String learning_curve_by_iterations_file = "src/opt/test/learning_curve_iterations.csv";
+        String learning_curve_by_iterations_file = "learning_curve_iterations_" + args[0] + ".csv";
         new File(learning_curve_by_iterations_file).delete();
 
         int trainingIterations = 1300;
@@ -42,9 +49,9 @@ public class NNOptimizationTest {
         List<Double> training_times = new ArrayList<>();
         List<Double> last_train_accuracy = new ArrayList<>();
         List<Double> last_test_accuracy = new ArrayList<>();
-        for(int i = 0; i < 3; i++) {
+//        for(int i = 0; i < 3; i++) {
 
-            System.out.println("Cross validation run " + i);
+            //System.out.println("Cross validation run " + i);
 
             Instance[][] training_testing_split = getTrainingAndTestingInstances(max_percentage_training, instances);
 
@@ -74,7 +81,7 @@ public class NNOptimizationTest {
             append_to_results_file(learning_curve_by_train_sizes_file, number_of_training_records, train_accuracy,
                     test_accuracy);
 
-        }
+//        }
 
         System.out.println("Training times: ");
         for(Double training_time : training_times) {
@@ -228,7 +235,7 @@ public class NNOptimizationTest {
     }
 
     private static List<List<Double>> train(OptimizationAlgorithm oa, BackPropagationNetwork network, String oaName,
-                              int trainingIterations, Instance[] train_records, Instance[] test_records, ErrorMeasure measure,
+                                            int trainingIterations, Instance[] train_records, Instance[] test_records, ErrorMeasure measure,
                                             Integer iteration_step_to_record) {
 
         List<Double> train_accuracy_per_iteration = new ArrayList<>();

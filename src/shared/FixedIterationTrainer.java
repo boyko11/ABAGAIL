@@ -46,16 +46,19 @@ public class FixedIterationTrainer implements Trainer {
         this.converge_iter = iterations;
         for (int i = 0; i < iterations; i++) {
             double optimal_value_after_training = trainer.train();
+            double current_optimal_value = optimal_value_after_training;
             sum += optimal_value_after_training;
-            double current_optimal_value = this.evaluationFunction.value(((OptimizationAlgorithm) trainer).getOptimal());
-            if(this.convergence_value == current_optimal_value) {
-                System.out.println("Converged in " + i + " iterations");
-                this.converge_iter = i + 1;
-                break;
+            if(this.evaluationFunction != null) {
+                current_optimal_value = this.evaluationFunction.value(((OptimizationAlgorithm) trainer).getOptimal());
+                if (this.convergence_value == current_optimal_value) {
+                    System.out.println("Converged in " + i + " iterations");
+                    this.converge_iter = i + 1;
+                    break;
+                }
             }
-            if(i % 100 == 0) {
-                System.out.println("Iteration " + i + " current optimum: " + optimal_value_after_training + " " + current_optimal_value);
-            }
+//            if(i % 100 == 0) {
+//                System.out.println("Iteration " + i + " current optimum: " + optimal_value_after_training + " " + current_optimal_value);
+//            }
         }
         long end_time = System.currentTimeMillis();
         this.train_time = end_time - start_time;

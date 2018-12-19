@@ -32,7 +32,7 @@ import shared.FixedIterationTrainer;
  */
 public class TwoColorsTest {
     /** The number of colors */
-    private static final int k = 2;
+    private static final int k = 11;
     /** The N value */
     private static final int N = 100*k;
 
@@ -48,25 +48,35 @@ public class TwoColorsTest {
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-        
+
+        double optimumValue = N - 2;
+        System.out.println("Optimum value: " + optimumValue);
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
-        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 100);
-        fit.train();
-        System.out.println(ef.value(rhc.getOptimal()));
+        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 2000);
+//        fit.setConvergence_value(optimumValue);
+//        fit.setEvaluationFunction(ef);
+//        fit.train();
+//        System.out.println("RHC: " + ef.value(rhc.getOptimal()));
         
-        SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
-        fit = new FixedIterationTrainer(sa, 100);
+//        SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
+//        fit = new FixedIterationTrainer(sa, 4000);
+//        fit.setConvergence_value(optimumValue);
+//        fit.setEvaluationFunction(ef);
+//        fit.train();
+//        System.out.println("SA: " + ef.value(sa.getOptimal()));
+//
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(3000, 600, 0, gap);
+        fit = new FixedIterationTrainer(ga, 4000);
+        fit.setConvergence_value(optimumValue);
+        fit.setEvaluationFunction(ef);
         fit.train();
-        System.out.println(ef.value(sa.getOptimal()));
-        
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(20, 20, 0, gap);
-        fit = new FixedIterationTrainer(ga, 100);
-        fit.train();
-        System.out.println(ef.value(ga.getOptimal()));
-        
-        MIMIC mimic = new MIMIC(50, 10, pop);
-        fit = new FixedIterationTrainer(mimic, 100);
-        fit.train();
-        System.out.println(ef.value(mimic.getOptimal()));
+        System.out.println("SA: " + ef.value(ga.getOptimal()));
+//
+//        MIMIC mimic = new MIMIC(100, 20, pop);
+//        fit = new FixedIterationTrainer(mimic, 500);
+//        fit.setConvergence_value(optimumValue);
+//        fit.setEvaluationFunction(ef);
+//        fit.train();
+//        System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
     }
 }

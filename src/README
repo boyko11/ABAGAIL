@@ -1,0 +1,20 @@
+Prerequisites:
+Java >= 8, python, numpy, matplotlib
+
+Part 1.1 - RHC in place of backpropagation
+
+java -classpath ABAGAIL.jar project2_cs7641.NNOptimizationTestBoyko RHC
+
+This generates two .csv files use for plotting by matplotlib:
+learning_curve_iterations_RHC.csv
+learning_curve_training_sizes_RHC.csv
+
+To generate the learning curves:
+
+python plotting_service.py RHC
+
+change plotting to plot both LCs to files
+lookup matplotlib write to a file, provide the filenames
+
+
+
