@@ -1,6 +1,19 @@
 code: https://github.com/boyko11/ABAGAIL
-This is a modified fork of ABAGAIL: https://github.com/pushkar/ABAGAIL
-Modifications are discussed in btodorov6-analisys.pdf
+    This is a modified fork of ABAGAIL: https://github.com/pushkar/ABAGAIL
+
+The main submission files:
+    https://github.com/boyko11/ABAGAIL/blob/master/ABAGAIL-Boyko.jar
+    https://github.com/boyko11/ABAGAIL/blob/master/src/project2_cs7641/NNOptimizationTestBoyko.java
+    https://github.com/boyko11/ABAGAIL/blob/master/src/plotting_service.py
+    https://github.com/boyko11/ABAGAIL/blob/master/src/opt/test/CountOnesTest.java
+    https://github.com/boyko11/ABAGAIL/blob/master/src/opt/test/FlipFlopTest.java
+    https://github.com/boyko11/ABAGAIL/blob/master/src/opt/test/FourPeaksTest.java
+    https://github.com/boyko11/ABAGAIL/blob/master/src/opt/test/KnapsackTest.java
+    https://github.com/boyko11/ABAGAIL/blob/master/src/opt/test/breast_cancer_zero_mean_unit_var.csv
+
+Remaining Modifications of the original ABAGAIL files are discussed in btodorov6-analisys.pdf
+
+Run Instructions:
 
 Assumes installed:
 Java >= 8, python >= 3, numpy, matplotlib
@@ -52,15 +65,14 @@ From the directory where the java command was run:
 
     python src/plotting_service.py RHC
 
-FOR SA or GA, replace RHC with SA or GA, e.g.
-
-    python src/plotting_service.py GA
-
     This generates two .png Learning Curve Graph files in the run directory:
 
     learning_curve_iterations_RHC.png
     learning_curve_training_sizes_RHC.png
 
+FOR SA or GA, replace RHC with SA or GA, e.g.
+
+    python src/plotting_service.py GA
 
 To duplicate the results from the CountOnesTest:
 
